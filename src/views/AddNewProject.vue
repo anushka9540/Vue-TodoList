@@ -3,7 +3,7 @@
     <h1>Add a New Project</h1>
     <form @submit.prevent="addProject">
       <label>Title:</label>
-      <input v-model="title" required class="title-box"/>
+      <input v-model="title" required class="title-box" />
   
       <label>Details:</label>
       <textarea v-model="details"></textarea>
@@ -19,6 +19,7 @@ import { ref, inject } from 'vue';
 import { useRouter } from 'vue-router';
 
 const projects = inject('projects');
+const saveProjects = inject('saveProjects');
 const title = ref('');
 const details = ref('');
 const router = useRouter();
@@ -33,6 +34,7 @@ const addProject = () => {
     status: 'ongoing'
   });
 
+  saveProjects();
   title.value = '';
   details.value = '';
 
@@ -53,12 +55,12 @@ h1 {
   margin: auto;
   padding: 21px;
   background: white;
-  height: 350px;
+  height: 420px;
 }
 
-.title-box{
+.title-box {
   border: none;
-  border-bottom:2px solid #7c7878;;
+  border-bottom: 2px solid #7c7878;
 }
 
 label {

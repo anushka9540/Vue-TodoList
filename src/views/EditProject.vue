@@ -3,7 +3,7 @@
     <h1>Edit Project</h1>
     <form @submit.prevent="updateProject">
       <label>Title:</label>
-      <input v-model="title" required class="title-box"/>
+      <input v-model="title" required class="title-box" />
   
       <label>Details:</label>
       <textarea v-model="details"></textarea>
@@ -19,6 +19,7 @@ import { ref, computed, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const projects = inject('projects');
+const saveProjects = inject('saveProjects');
 const route = useRoute();
 const router = useRouter();
 
@@ -33,6 +34,7 @@ const updateProject = () => {
   if (project.value) {
     project.value.title = title.value;
     project.value.details = details.value;
+    saveProjects();
     router.push('/');
   }
 };
@@ -60,9 +62,9 @@ label {
   font-weight: 500;
 }
 
-.title-box{
+.title-box {
   border: none;
-  border-bottom:2px solid #7c7878;;
+  border-bottom: 2px solid #7c7878;
 }
 
 input,

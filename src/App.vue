@@ -1,38 +1,31 @@
 <template>
   <div class="app-container">
-    <nav>
-      <router-link to="/">Projects</router-link>
-      <router-link to="/add">Add a New Project</router-link>
+    <nav class="nav">
+      <router-link to="/" exact-active-class="active-link">Projects</router-link>
+      <router-link to="/add" exact-active-class="active-link">Add a New Project</router-link>
     </nav>
     <router-view></router-view>
   </div>
 </template>
 
 <script setup>
-import { ref, provide } from 'vue';
+import { ref, provide, onMounted } from 'vue';
 
-const projects = ref([
-  {
-    id: 1,
-    title: 'Create new homepage banner',
-    details: 'Update the homepage with a fresh banner',
-    status: 'ongoing'
-  },
-  {
-    id: 2,
-    title: 'Make marketing email',
-    details: 'Send a promotional email to subscribers',
-    status: 'completed'
-  },
-  {
-    id: 3,
-    title: 'Update promo links',
-    details: 'Ensure all promo links are correct',
-    status: 'ongoing'
-  }
-]);
+const projects = ref([]);
+
+const loadProjects = () => {
+  const savedProjects = localStorage.getItem('projects');
+  projects.value = savedProjects ? JSON.parse(savedProjects) : [];
+};
+
+const saveProjects = () => {
+  localStorage.setItem('projects', JSON.stringify(projects.value));
+};
+
+onMounted(loadProjects);
 
 provide('projects', projects);
+provide('saveProjects', saveProjects);
 </script>
 
 <style scoped>
@@ -48,25 +41,36 @@ nav {
   justify-content: center;
   gap: 20px;
   padding: 15px;
-  background: #333;
+  background: #494949;
   border-radius: 8px;
 }
 
-nav a {
+.nav {
+  display: flex;
+  gap: 20px;
+  font-size: 18px;
+}
+
+.nav a {
   text-decoration: none;
-  color: white;
+  color: #ffffff;
+  font-weight: 500;
+  position: relative;
+}
+
+.nav a.active-link {
+  /* color: #2ecc71; Green active color */
   font-weight: bold;
-  padding: 10px 15px;
-  border-radius: 5px;
-  transition: background 0.3s;
 }
 
-nav a router-link-exact-active {
-  background: #007bff;
-}
-
-nav a:hover {
-  background: #007bff;
+.nav a.active-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background-color: #e91e63;
 }
 
 @media (max-width: 600px) {

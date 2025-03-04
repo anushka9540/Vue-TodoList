@@ -4,10 +4,8 @@
     <form @submit.prevent="updateProject">
       <label>Title:</label>
       <input v-model="title" required class="title-box" />
-  
       <label>Details:</label>
       <textarea v-model="details"></textarea>
-  
       <button type="submit">Update Project</button>
     </form>
     <router-link to="/">Back to Projects</router-link>
@@ -23,17 +21,13 @@ const saveProjects = inject('saveProjects');
 const route = useRoute();
 const router = useRouter();
 
-const project = computed(() =>
-  projects.value.find((p) => p.id === Number(route.params.id))
-);
-
+const project = computed(() => projects.value.find((p) => p.id === Number(route.params.id)));
 const title = ref(project.value?.title || '');
 const details = ref(project.value?.details || '');
 
 const updateProject = () => {
   if (project.value) {
-    project.value.title = title.value;
-    project.value.details = details.value;
+    Object.assign(project.value, { title: title.value, details: details.value });
     saveProjects();
     router.push('/');
   }

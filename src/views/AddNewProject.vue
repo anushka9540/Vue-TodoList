@@ -4,10 +4,8 @@
     <form @submit.prevent="addProject">
       <label>Title:</label>
       <input v-model="title" required class="title-box" />
-  
       <label>Details:</label>
       <textarea v-model="details" required></textarea>
-  
       <button type="submit">Add Project</button>
     </form>
     <router-link to="/">Back to Projects</router-link>
@@ -21,28 +19,15 @@ import { useRouter } from 'vue-router';
 const projects = inject('projects');
 const saveProjects = inject('saveProjects');
 const lastId = inject('lastId');
-
 const title = ref('');
 const details = ref('');
 const router = useRouter();
 
 const addProject = () => {
-  if (title.value.trim() === '') return;
-
   lastId.value++;
-
-  projects.value.push({
-    id: lastId.value,
-    title: title.value,
-    details: details.value || 'No details provided',
-    status: 'ongoing'
-  });
-
+  projects.value.push({ id: lastId.value, title: title.value, details: details.value || 'No details provided', status: 'ongoing' });
   saveProjects();
-
-  title.value = '';
-  details.value = '';
-
+  title.value = details.value = '';
   router.push('/');
 };
 </script>

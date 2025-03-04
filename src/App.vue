@@ -9,22 +9,23 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted } from 'vue';
+import { ref, provide } from 'vue';
 
 const projects = ref([]);
-
-const loadProjects = () => {
-  const savedProjects = localStorage.getItem('projects');
-  projects.value = savedProjects ? JSON.parse(savedProjects) : [];
-};
-
+const lastId = ref(0);
 const saveProjects = () => {
   localStorage.setItem('projects', JSON.stringify(projects.value));
+  localStorage.setItem('lastId', lastId.value);
 };
 
-onMounted(loadProjects);
+const storedProjects = localStorage.getItem('projects');
+if (storedProjects) {
+  projects.value = JSON.parse(storedProjects);
+  lastId.value = Number(localStorage.getItem('lastId')) || 0;
+}
 
 provide('projects', projects);
+provide('lastId', lastId);
 provide('saveProjects', saveProjects);
 </script>
 
@@ -59,7 +60,6 @@ nav {
 }
 
 .nav a.active-link {
-  /* color: #2ecc71; Green active color */
   font-weight: bold;
 }
 

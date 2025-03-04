@@ -15,7 +15,10 @@
     </div>
   
     <div class="project-list">
-      <ul>
+      <div v-if="filteredProjects.length === 0" class="no-projects">
+        <p>No projects found. Add a project!</p>
+      </div>
+      <ul v-else>
         <li v-for="project in filteredProjects" :key="project.id" :class="{ completed: project.status === 'completed' }">
           <div class="project-item">
             <div class="project-title" @click="toggleDetails(project.id)">
@@ -73,10 +76,10 @@ const deleteProject = (id) => {
   projects.value = projects.value.filter((p) => p.id !== id);
   saveProjects();
 };
+
 </script>
 
 <style scoped>
-
 .project-container {
   max-width: 500px;
   margin: auto;
@@ -134,6 +137,13 @@ h1 {
   background: #f5f5f5;
 }
 
+.no-projects {
+  text-align: center;
+  font-size: 18px;
+  color: #888;
+  margin-top: 20px;
+}
+
 ul {
   list-style: none;
   padding: 0;
@@ -150,7 +160,6 @@ li {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   border-left: 5px solid #e91e63;
 }
-
 
 li.completed {
   border-left: 5px solid #2ecc71 !important;

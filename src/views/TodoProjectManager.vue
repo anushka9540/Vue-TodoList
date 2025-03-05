@@ -1,7 +1,11 @@
 <template>
   <div class="form-container">
-    <h1>{{ isEditing ? 'Edit Project' : 'Add a New Project' }}</h1>
-    <form @submit.prevent="handleSubmit">
+    <h1 v-if="!projectNotFound">
+      {{ isEditing ? 'Edit Project' : 'Add a New Project' }}
+    </h1>
+    <p v-if="projectNotFound" class="error-message">Todo to edit not found</p>
+  
+    <form v-if="!projectNotFound" @submit.prevent="handleSubmit">
       <label>Title:</label>
       <input v-model.trim="formData.title" @input="validate('title')" @keydown.enter.prevent class="title-box" />
       <p v-if="errors.title" class="error">{{ errors.title }}</p>
@@ -14,6 +18,7 @@
         {{ isEditing ? 'Update Project' : 'Add Project' }}
       </button>
     </form>
+  
     <router-link to="/">Back to Projects</router-link>
   </div>
 </template>
@@ -50,11 +55,10 @@ const validate = (field) => {
 const isFormValid = computed(
   () => !errors.value.title && !errors.value.details
 );
-const generateUniqueId = () => {
-  return projects.value.length
-    ? Math.max(...projects.value.map((p) => p.id)) + 1
-    : 1;
+const generateRandomId = () => {
+  return Date.now() + Math.floor(Math.random() * 1000);
 };
+
 const handleSubmit = () => {
   validate('title');
   validate('details');
@@ -64,7 +68,7 @@ const handleSubmit = () => {
     projectToEdit.value.details = formData.value.details;
   } else {
     projects.value.push({
-      id: generateUniqueId(),
+      id: generateRandomId(),
       title: formData.value.title,
       details: formData.value.details,
       status: 'ongoing'
@@ -73,6 +77,8 @@ const handleSubmit = () => {
   saveProjects();
   router.push('/');
 };
+const projectNotFound = ref(false);
+
 onMounted(() => {
   const projectId = Number(route.params.id);
   if (projectId) {
@@ -81,6 +87,8 @@ onMounted(() => {
       formData.value.title = projectToEdit.value.title;
       formData.value.details = projectToEdit.value.details;
       isEditing.value = true;
+    } else {
+      projectNotFound.value = true;
     }
   }
 });
@@ -142,6 +150,14 @@ button:disabled {
 
 button:hover:not(:disabled) {
   background: #219150;
+}
+
+.error-message {
+  text-align: center;
+  font-size: 35px;
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
 }
 
 .error {

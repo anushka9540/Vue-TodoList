@@ -80,16 +80,25 @@ const handleSubmit = () => {
 const projectNotFound = ref(false);
 
 onMounted(() => {
-  const projectId = Number(route.params.id);
-  if (projectId) {
-    projectToEdit.value = projects.value.find((p) => p.id === projectId);
-    if (projectToEdit.value) {
-      formData.value.title = projectToEdit.value.title;
-      formData.value.details = projectToEdit.value.details;
-      isEditing.value = true;
-    } else {
-      projectNotFound.value = true;
-    }
+  const projectId = route.params.id ? Number(route.params.id) : null;
+
+  if (projectId === null) {
+    return;
+  }
+
+  if (isNaN(projectId)) {
+    projectNotFound.value = true;
+    return;
+  }
+
+  projectToEdit.value = projects.value.find((p) => p.id === projectId);
+
+  if (projectToEdit.value) {
+    formData.value.title = projectToEdit.value.title;
+    formData.value.details = projectToEdit.value.details;
+    isEditing.value = true;
+  } else {
+    projectNotFound.value = true;
   }
 });
 </script>

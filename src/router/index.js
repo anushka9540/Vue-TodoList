@@ -1,12 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Projects from '../views/Project.vue';
-import AddProject from '../views/AddNewProject.vue';
-import EditProject from '../views/EditProject.vue';
+import Project from '../views/Project.vue';
+import AddNewProject from '../views/AddNewProject.vue';
 
 const routes = [
-  { path: '/', component: Projects },
-  { path: '/add', component: AddProject },
-  { path: '/edit/:id', component: EditProject, props: true }
+  { path: '/', component: Project },
+  { path: '/add', component: AddNewProject },
+  { path: '/edit/:id', component: AddNewProject } 
 ];
 
 const router = createRouter({
@@ -15,3 +14,4 @@ const router = createRouter({
 });
 
 export default router;
+

@@ -127,6 +127,8 @@ li {
   flex-direction: column;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   border-left: 5px solid #e91e63;
+  word-wrap: break-word; 
+  overflow-wrap: break-word;
 }
 
 li.completed {
@@ -137,6 +139,7 @@ li.completed {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .project-title {
@@ -176,6 +179,7 @@ li.completed {
   margin-top: 8px;
   font-size: 14px;
   color: #555;
+  text-align: left;
 }
 
 @media (max-width: 600px) {

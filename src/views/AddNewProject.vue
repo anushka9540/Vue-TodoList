@@ -1,7 +1,7 @@
 <template>
   <div class="form-container">
-    <h1>Add a New Project</h1>
-    <form @submit.prevent="addProject">
+    <h1>{{ isEditing ? 'Edit Project' : 'Add a New Project' }}</h1>
+    <form @submit.prevent="handleSubmit">
       <label>Title:</label>
       <input v-model.trim="title" @input="validate('title')" @keydown.enter.prevent class="title-box" />
       <p v-if="errors.title" class="error">{{ errors.title }}</p>
@@ -10,28 +10,34 @@
       <textarea v-model.trim="details" @input="validate('details')"></textarea>
       <p v-if="errors.details" class="error">{{ errors.details }}</p>
   
-      <button type="submit" :disabled="!isFormValid">Add Project</button>
+      <button type="submit" :disabled="!isFormValid">
+        {{ isEditing ? 'Update Project' : 'Add Project' }}
+      </button>
     </form>
     <router-link to="/">Back to Projects</router-link>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, inject, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const projects = inject('projects');
 const saveProjects = inject('saveProjects');
 const lastId = inject('lastId');
 const router = useRouter();
+const route = useRoute();
 
 const title = ref('');
 const details = ref('');
 const errors = ref({ title: '', details: '' });
 
+const isEditing = ref(false);
+const projectToEdit = ref(null);
+
 const rules = {
   title: { required: true, min: 3, max: 50 },
-  details: { required: true, min: 10, max: 200 }
+  details: { required: true, min: 10, max: 300 }
 };
 
 const validate = (field) => {
@@ -39,31 +45,56 @@ const validate = (field) => {
   const { required, min, max } = rules[field];
 
   errors.value[field] =
-    !value && required ? `${field.charAt(0).toUpperCase() + field.slice(1)} is required.` :
-      value.length < min ? `${field.charAt(0).toUpperCase() + field.slice(1)} must be at least ${min} characters.` :
-        value.length > max ? `${field.charAt(0).toUpperCase() + field.slice(1)} cannot exceed ${max} characters.` :
-          '';
+    !value && required
+      ? `${field.charAt(0).toUpperCase() + field.slice(1)} is required.`
+      : value.length < min
+        ? `${field.charAt(0).toUpperCase() + field.slice(1)
+        } must be at least ${min} characters.`
+        : value.length > max
+          ? `${field.charAt(0).toUpperCase() + field.slice(1)
+          } cannot exceed ${max} characters.`
+          : '';
 };
 
-const isFormValid = computed(() => !errors.value.title && !errors.value.details);
+const isFormValid = computed(
+  () => !errors.value.title && !errors.value.details
+);
 
-const addProject = () => {
+const handleSubmit = () => {
   validate('title');
   validate('details');
 
   if (!isFormValid.value) return;
 
-  projects.value.push({
-    id: ++lastId.value,
-    title: title.value,
-    details: details.value,
-    status: 'ongoing'
-  });
+  if (isEditing.value && projectToEdit.value) {
+    // Update existing project
+    projectToEdit.value.title = title.value;
+    projectToEdit.value.details = details.value;
+  } else {
+    // Add new project
+    projects.value.push({
+      id: ++lastId.value,
+      title: title.value,
+      details: details.value,
+      status: 'ongoing'
+    });
+  }
 
   saveProjects();
-  title.value = details.value = '';
   router.push('/');
 };
+
+onMounted(() => {
+  const projectId = Number(route.params.id);
+  if (projectId) {
+    projectToEdit.value = projects.value.find((p) => p.id === projectId);
+    if (projectToEdit.value) {
+      title.value = projectToEdit.value.title;
+      details.value = projectToEdit.value.details;
+      isEditing.value = true;
+    }
+  }
+});
 </script>
 
 <style scoped>
@@ -79,7 +110,7 @@ h1 {
   margin: auto;
   padding: 21px;
   background: white;
-  height: auto;
+  height: 420px;
 }
 
 .title-box {
@@ -129,6 +160,8 @@ button:hover:not(:disabled) {
   font-size: 14px;
   margin-top: -5px;
   margin-bottom: 10px;
+  margin-left: 20px;
+  text-align: left;
 }
 
 @media (max-width: 600px) {

@@ -10,22 +10,14 @@
 
 <script setup>
 import { ref, provide, onMounted } from 'vue';
-
 const projects = ref([]);
-const lastId = ref(0);
-
 const saveProjects = () => {
   localStorage.setItem('projects', JSON.stringify(projects.value));
-  localStorage.setItem('lastId', lastId.value);
 };
-
 onMounted(() => {
   projects.value = JSON.parse(localStorage.getItem('projects')) || [];
-  lastId.value = Number(localStorage.getItem('lastId')) || 0;
 });
-
 provide('projects', projects);
-provide('lastId', lastId);
 provide('saveProjects', saveProjects);
 </script>
 

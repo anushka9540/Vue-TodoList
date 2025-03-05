@@ -3,11 +3,11 @@
     <h1>{{ isEditing ? 'Edit Project' : 'Add a New Project' }}</h1>
     <form @submit.prevent="handleSubmit">
       <label>Title:</label>
-      <input v-model.trim="title" @input="validate('title')" @keydown.enter.prevent class="title-box" />
+      <input v-model.trim="formData.title" @input="validate('title')" @keydown.enter.prevent class="title-box" />
       <p v-if="errors.title" class="error">{{ errors.title }}</p>
   
       <label>Details:</label>
-      <textarea v-model.trim="details" @input="validate('details')"></textarea>
+      <textarea v-model.trim="formData.details" @input="validate('details')"></textarea>
       <p v-if="errors.details" class="error">{{ errors.details }}</p>
   
       <button type="submit" :disabled="!isFormValid">
@@ -21,29 +21,21 @@
 <script setup>
 import { ref, computed, inject, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-
 const projects = inject('projects');
 const saveProjects = inject('saveProjects');
-const lastId = inject('lastId');
 const router = useRouter();
 const route = useRoute();
-
-const title = ref('');
-const details = ref('');
+const formData = ref({ title: '', details: '' });
 const errors = ref({ title: '', details: '' });
-
 const isEditing = ref(false);
 const projectToEdit = ref(null);
-
 const rules = {
   title: { required: true, min: 3, max: 50 },
   details: { required: true, min: 10, max: 300 }
 };
-
 const validate = (field) => {
-  const value = field === 'title' ? title.value.trim() : details.value.trim();
+  const value = formData.value[field].trim();
   const { required, min, max } = rules[field];
-
   errors.value[field] =
     !value && required
       ? `${field.charAt(0).toUpperCase() + field.slice(1)} is required.`
@@ -55,42 +47,39 @@ const validate = (field) => {
           } cannot exceed ${max} characters.`
           : '';
 };
-
 const isFormValid = computed(
   () => !errors.value.title && !errors.value.details
 );
-
+const generateUniqueId = () => {
+  return projects.value.length
+    ? Math.max(...projects.value.map((p) => p.id)) + 1
+    : 1;
+};
 const handleSubmit = () => {
   validate('title');
   validate('details');
-
   if (!isFormValid.value) return;
-
   if (isEditing.value && projectToEdit.value) {
-    // Update existing project
-    projectToEdit.value.title = title.value;
-    projectToEdit.value.details = details.value;
+    projectToEdit.value.title = formData.value.title;
+    projectToEdit.value.details = formData.value.details;
   } else {
-    // Add new project
     projects.value.push({
-      id: ++lastId.value,
-      title: title.value,
-      details: details.value,
+      id: generateUniqueId(),
+      title: formData.value.title,
+      details: formData.value.details,
       status: 'ongoing'
     });
   }
-
   saveProjects();
   router.push('/');
 };
-
 onMounted(() => {
   const projectId = Number(route.params.id);
   if (projectId) {
     projectToEdit.value = projects.value.find((p) => p.id === projectId);
     if (projectToEdit.value) {
-      title.value = projectToEdit.value.title;
-      details.value = projectToEdit.value.details;
+      formData.value.title = projectToEdit.value.title;
+      formData.value.details = projectToEdit.value.details;
       isEditing.value = true;
     }
   }

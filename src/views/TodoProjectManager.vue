@@ -3,7 +3,7 @@
     <h1 v-if="!projectNotFound">
       {{ isEditing ? 'Edit Project' : 'Add a New Project' }}
     </h1>
-    <p v-if="projectNotFound" class="error-message">Todo to edit not found</p>
+    <p v-if="projectNotFound" class="error-message">OOPs No Todo is Found !</p>
   
     <form v-if="!projectNotFound" @submit.prevent="handleSubmit">
       <label>Title:</label>
@@ -86,7 +86,7 @@ onMounted(() => {
     return;
   }
 
-  if (isNaN(projectId)) {
+  if (!(typeof projectId === 'number' && !isNaN(projectId))) {
     projectNotFound.value = true;
     return;
   }
@@ -162,11 +162,10 @@ button:hover:not(:disabled) {
 }
 
 .error-message {
-  text-align: center;
   font-size: 35px;
   color: red;
   font-weight: bold;
-  margin-top: 20px;
+  margin-top: 70px;
 }
 
 .error {

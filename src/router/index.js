@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Project from '../views/Project.vue';
-import AddNewProject from '../views/TodoProjectManager.vue';
-import ProjectForm from '../views/TodoProjectManager.vue';
+import ProjectForm from '../views/AddEditProject.vue';
 
 const routes = [
   { path: '/', component: Project },

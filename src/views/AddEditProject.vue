@@ -86,11 +86,6 @@ onMounted(() => {
     return;
   }
 
-  if (!(typeof projectId === 'number' && !isNaN(projectId))) {
-    projectNotFound.value = true;
-    return;
-  }
-
   projectToEdit.value = projects.value.find((p) => p.id === projectId);
 
   if (projectToEdit.value) {

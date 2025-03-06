@@ -1,24 +1,25 @@
 <template>
   <div class="form-container">
-    <h1 v-if="!projectNotFound">
-      {{ isEditing ? 'Edit Project' : 'Add a New Project' }}
-    </h1>
-    <p v-if="projectNotFound" class="error-message">OOPs No Todo is Found !</p>
-  
-    <form v-if="!projectNotFound" @submit.prevent="handleSubmit">
-      <label>Title:</label>
-      <input v-model.trim="formData.title" @input="validate('title')" @keydown.enter.prevent class="title-box" />
-      <p v-if="errors.title" class="error">{{ errors.title }}</p>
-  
-      <label>Details:</label>
-      <textarea v-model.trim="formData.details" @input="validate('details')"></textarea>
-      <p v-if="errors.details" class="error">{{ errors.details }}</p>
-  
-      <button type="submit" :disabled="!isFormValid">
-        {{ isEditing ? 'Update Project' : 'Add Project' }}
-      </button>
-    </form>
-  
+    <div v-if="!projectNotFound">
+      <h1>{{ isEditing ? 'Edit Project' : 'Add a New Project' }}</h1>
+
+      <form @submit.prevent="handleSubmit">
+        <label>Title:</label>
+        <input v-model.trim="formData.title" @input="validate('title')" @keydown.enter.prevent class="title-box" />
+        <p v-if="errors.title" class="error">{{ errors.title }}</p>
+
+        <label>Details:</label>
+        <textarea v-model.trim="formData.details" @input="validate('details')"></textarea>
+        <p v-if="errors.details" class="error">{{ errors.details }}</p>
+
+        <button type="submit" :disabled="!isFormValid">
+          {{ isEditing ? 'Update Project' : 'Add Project' }}
+        </button>
+      </form>
+    </div>
+
+    <p v-else class="error-message">OOPs No Todo is Found !</p>
+
     <router-link to="/">Back to Projects</router-link>
   </div>
 </template>
@@ -34,6 +35,7 @@ const formData = ref({ title: '', details: '' });
 const errors = ref({ title: '', details: '' });
 const isEditing = ref(false);
 const projectToEdit = ref(null);
+const projectNotFound = ref(false);
 const rules = {
   title: { required: true, min: 3, max: 50 },
   details: { required: true, min: 10, max: 300 }
@@ -77,7 +79,6 @@ const handleSubmit = () => {
   saveProjects();
   router.push('/');
 };
-const projectNotFound = ref(false);
 
 onMounted(() => {
   const projectId = route.params.id ? Number(route.params.id) : null;

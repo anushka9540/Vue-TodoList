@@ -162,6 +162,7 @@ li {
   border-left: 5px solid #e91e63;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  cursor: pointer;
 }
 
 li.completed {

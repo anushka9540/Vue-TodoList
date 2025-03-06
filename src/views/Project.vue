@@ -1,54 +1,79 @@
 <template>
   <div class="project-container">
     <h1>Projects</h1>
+
     <div class="filters">
-      <button v-for="status in ['all', 'completed', 'ongoing']" :key="status" @click="filterStatus(status)"
-        :class="{ active: selectedFilter === status }">
+      <button v-for="status in ['all', 'completed', 'ongoing']" 
+              :key="status" 
+              @click="filterStatus(status)" 
+              :class="{ active: selectedFilter === status }">
         {{ status.charAt(0).toUpperCase() + status.slice(1) }}
       </button>
     </div>
+
     <ul class="project-list" v-if="filteredProjects.length">
-      <li v-for="project in filteredProjects" :key="project.id" :class="{ completed: project.status === 'completed' }">
+      <li v-for="project in filteredProjects" 
+          :key="project.id" 
+          :class="{ completed: project.status === 'completed' }"
+          @click="showDetails(project.id, $event)">
+          
         <div class="project-item">
-          <div class="project-title" @click="showDetails(project.id)">
+          <div class="project-title">
             {{ project.title }}
           </div>
+
           <div class="project-actions">
-            <button @click="toggleStatus(project)" class="btn status-btn"
-              :class="{ 'completed-btn': project.status === 'completed' }">
+            <button @click="toggleStatus(project)" 
+                    class="btn status-btn" 
+                    :class="{ 'completed-btn': project.status === 'completed' }">
               ✔
             </button>
-            <router-link :to="'/edit/' + project.id"><button class="btn">✏️</button></router-link>
+            <router-link :to="'/edit/' + project.id">
+              <button class="btn">✏️</button>
+            </router-link>
             <button @click="deleteProject(project.id)" class="btn">🗑</button>
           </div>
         </div>
+
         <p v-if="expandedProject === project.id" class="project-details">
           {{ project.details }}
         </p>
       </li>
     </ul>
+
     <p v-else class="no-projects">No projects found. Add a project!</p>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, inject } from 'vue';
+
 const projects = inject('projects');
 const saveProjects = inject('saveProjects');
+
 const selectedFilter = ref('all');
 const expandedProject = ref(null);
+
 const filteredProjects = computed(() =>
   selectedFilter.value === 'all'
     ? projects.value
     : projects.value.filter((proj) => proj.status === selectedFilter.value)
 );
+
 const filterStatus = (status) => (selectedFilter.value = status);
-const showDetails = (id) =>
-  (expandedProject.value = expandedProject.value === id ? null : id);
+
+const showDetails = (id, event) => {
+  // Prevent expanding details if clicking inside an action button
+  if (event.target.closest('.btn')) return;
+
+  expandedProject.value = expandedProject.value === id ? null : id;
+};
+
 const toggleStatus = (project) => {
   project.status = project.status === 'completed' ? 'ongoing' : 'completed';
   saveProjects();
 };
+
 const deleteProject = (id) => {
   projects.value = projects.value.filter((p) => p.id !== id);
   saveProjects();

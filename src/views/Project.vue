@@ -3,11 +3,11 @@
     <h1>Projects</h1>
 
     <div class="filters">
-      <button v-for="status in ['all', 'completed', 'ongoing']" 
-              :key="status" 
-              @click="filterStatus(status)" 
-              :class="{ active: selectedFilter === status }">
-        {{ status.charAt(0).toUpperCase() + status.slice(1) }}
+      <button v-for="(label, key) in filters[0]" 
+              :key="key" 
+              @click="filterStatus(key)" 
+              :class="{ active: selectedFilter === key }">
+        {{ label }}
       </button>
     </div>
 
@@ -16,7 +16,7 @@
           :key="project.id" 
           :class="{ completed: project.status === 'completed' }"
           @click="showDetails(project.id, $event)">
-          
+
         <div class="project-item">
           <div class="project-title">
             {{ project.title }}
@@ -31,7 +31,7 @@
             <router-link :to="'/edit/' + project.id">
               <button class="btn">✏️</button>
             </router-link>
-            <button @click="deleteProject(project.id)" class="btn">🗑</button>
+            <button @click="openDeleteModal(project.id)" class="btn">🗑</button>
           </div>
         </div>
 
@@ -42,17 +42,26 @@
     </ul>
 
     <p v-else class="no-projects">No projects found. Add a project!</p>
+
+    <DeleteModal :isOpen="deleteModalOpen" @confirm="deleteProject" @close="closeDeleteModal" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, inject } from 'vue';
+import DeleteModal from './DeleteModal.vue';
 
 const projects = inject('projects');
 const saveProjects = inject('saveProjects');
 
 const selectedFilter = ref('all');
 const expandedProject = ref(null);
+const deleteModalOpen = ref(false);
+const projectToDelete = ref(null);
+
+const filters = [
+  { all: 'All', completed: 'Completed', ongoing: 'Ongoing' }
+];
 
 const filteredProjects = computed(() =>
   selectedFilter.value === 'all'
@@ -63,9 +72,7 @@ const filteredProjects = computed(() =>
 const filterStatus = (status) => (selectedFilter.value = status);
 
 const showDetails = (id, event) => {
-  // Prevent expanding details if clicking inside an action button
   if (event.target.closest('.btn')) return;
-
   expandedProject.value = expandedProject.value === id ? null : id;
 };
 
@@ -74,9 +81,22 @@ const toggleStatus = (project) => {
   saveProjects();
 };
 
-const deleteProject = (id) => {
-  projects.value = projects.value.filter((p) => p.id !== id);
-  saveProjects();
+const openDeleteModal = (id) => {
+  projectToDelete.value = id;
+  deleteModalOpen.value = true;
+};
+
+const closeDeleteModal = () => {
+  deleteModalOpen.value = false;
+  projectToDelete.value = null;
+};
+
+const deleteProject = () => {
+  if (projectToDelete.value !== null) {
+    projects.value = projects.value.filter((p) => p.id !== projectToDelete.value);
+    saveProjects();
+  }
+  closeDeleteModal();
 };
 </script>
 

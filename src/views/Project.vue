@@ -3,11 +3,11 @@
     <h1>Projects</h1>
 
     <div class="filters">
-      <button v-for="(label, key) in filters[0]" 
-              :key="key" 
-              @click="filterStatus(key)" 
-              :class="{ active: selectedFilter === key }">
-        {{ label }}
+      <button v-for="filter in filters" 
+              :key="filter.key" 
+              @click="filterStatus(filter.key)" 
+              :class="{ active: selectedFilter === filter.key }">
+        {{ filter.label }}
       </button>
     </div>
 
@@ -43,7 +43,7 @@
 
     <p v-else class="no-projects">No projects found. Add a project!</p>
 
-    <DeleteModal :isOpen="deleteModalOpen" @confirm="deleteProject" @close="closeDeleteModal" />
+    <DeleteModal :isOpen="isDeleteModalVisible" @confirm="deleteProject" @close="closeDeleteModal" />
   </div>
 </template>
 
@@ -56,11 +56,13 @@ const saveProjects = inject('saveProjects');
 
 const selectedFilter = ref('all');
 const expandedProject = ref(null);
-const deleteModalOpen = ref(false);
+const isDeleteModalVisible = ref(false);
 const projectToDelete = ref(null);
 
 const filters = [
-  { all: 'All', completed: 'Completed', ongoing: 'Ongoing' }
+  { key: 'all', label: 'All' },
+  { key: 'completed', label: 'Completed' },
+  { key: 'ongoing', label: 'Ongoing' }
 ];
 
 const filteredProjects = computed(() =>
@@ -83,11 +85,11 @@ const toggleStatus = (project) => {
 
 const openDeleteModal = (id) => {
   projectToDelete.value = id;
-  deleteModalOpen.value = true;
+  isDeleteModalVisible.value = true;
 };
 
 const closeDeleteModal = () => {
-  deleteModalOpen.value = false;
+  isDeleteModalVisible.value = false;
   projectToDelete.value = null;
 };
 
